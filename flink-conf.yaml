@@ -1,0 +1,150 @@
+# Apache Flink Configuration for Fault-Tolerant Stream Processing
+# This configuration sets up Flink for the fraud detection system with:
+# - Multiple TaskManagers for distributed parallelism
+# - Checkpoint-based fault tolerance
+# - Web UI monitoring
+# - Optimized for the local cluster setup
+
+# ============================
+# JobManager Configuration
+# ============================
+
+# JobManager runs on localhost by default
+jobmanager.rpc.address: localhost
+jobmanager.rpc.port: 6123
+
+# JobManager memory
+jobmanager.memory.process.size: 1600m
+
+# Enable Web UI
+jobmanager.web.submit.enable: true
+rest.port: 8081
+
+# ============================
+# TaskManager Configuration
+# ============================
+
+# Number of task slots per TaskManager
+# Set to 4 to simulate multiple workers
+taskmanager.numberOfTaskSlots: 4
+
+# TaskManager memory
+taskmanager.memory.process.size: 1728m
+
+# Network buffers
+taskmanager.network.memory.fraction: 0.1
+
+# ============================
+# Parallelism Configuration
+# ============================
+
+# Default parallelism for jobs
+# Must be > 1 to show distributed execution
+parallelism.default: 4
+
+# ============================
+# Checkpointing Configuration (CRITICAL FOR FAULT TOLERANCE)
+# ============================
+
+# State backend: hashmap (fast, for demo) or rocksdb (production)
+state.backend.type: hashmap
+
+# Checkpoint directory - MUST EXIST and be writable
+state.checkpoints.dir: file:///tmp/flink-checkpoints
+
+# Savepoint directory
+state.savepoints.dir: file:///tmp/flink-savepoints
+
+# Enable checkpointing
+# Configuration is also done programmatically in Java code
+execution.checkpointing.interval: 10000
+execution.checkpointing.mode: EXACTLY_ONCE
+execution.checkpointing.timeout: 600000
+
+# External checkpoints: keep for recovery
+state.checkpoints.num-retained: 5
+
+# ============================
+# Logging Configuration
+# ============================
+
+# Log level
+logger.name: org.apache.flink
+logger.level: INFO
+
+# Reduce verbose logs
+logger.name.org.apache.hadoop = WARN
+logger.name.org.apache.kafka = WARN
+
+# ============================
+# Monitoring Configuration
+# ============================
+
+# Enable metric reporters
+metrics.reporters: jmx
+
+# JMX metrics
+metrics.reporter.jmx.factory.class: org.apache.flink.metrics.jmx.JMXReporterFactory
+
+# ============================
+# Recovery Configuration
+# ============================
+
+# High availability is NOT needed for local mode
+# But these settings ensure graceful recovery
+
+# Restart strategy: restart on failure
+restart-strategy: exponential-delay
+restart-strategy.exponential-delay.initial-backoff: 1 s
+restart-strategy.exponential-delay.max-backoff: 1 min
+restart-strategy.exponential-delay.backoff-multiplier: 2.0
+restart-strategy.exponential-delay.reset-backoff-threshold: 10 min
+
+# ============================
+# RocksDB State Backend (Optional - for production-like setup)
+# Uncomment to use instead of hashmap
+# ============================
+
+# state.backend.type: rocksdb
+# state.backend.rocksdb.checkpointdir: /tmp/flink-rocksdb-checkpoints
+# state.backend.rocksdb.localdir: /tmp/flink-rocksdb-local
+# state.backend.rocksdb.timer-service.factory: rocksdb
+
+# ============================
+# Memory Configuration
+# ============================
+
+# Heap memory for slots
+taskmanager.memory.jvm-overhead.fraction: 0.1
+taskmanager.memory.managed.fraction: 0.4
+
+# ============================
+# Network Configuration
+# ============================
+
+# Network buffer timeout
+taskmanager.network.memory.buffers.per-channel: 2
+taskmanager.network.memory.floating-buffers-per-gate: 8
+
+# ============================
+# Miscellaneous
+# ============================
+
+# Shutdown timeout
+jobmanager.execution.failover-strategy: region
+taskmanager.execution.failover-strategy: region
+
+# Enable RPC compression
+taskmanager.rpc.compression: false
+
+# Print configuration on startup (helpful for debugging)
+jobmanager.environment.log-dir: ./logs
+taskmanager.environment.log-dir: ./logs
+
+# ============================
+# Important: Before running, create checkpoint directories:
+# ============================
+# mkdir -p /tmp/flink-checkpoints
+# mkdir -p /tmp/flink-savepoints
+# chmod 777 /tmp/flink-checkpoints
+# chmod 777 /tmp/flink-savepoints
