@@ -1,4 +1,4 @@
-# 🎯 Fault-Tolerant Real-Time Stream Processing System
+# Fault-Tolerant Real-Time Stream Processing System
 ## E-Commerce Fraud Detection using Apache Flink
 
 **A distributed system implementation demonstrating fault tolerance, checkpointing, and automatic recovery.**
@@ -11,7 +11,7 @@ This is a **4-member team project** that implements a real-world fraud detection
 
 ---
 
-## 📁 QUICK NAVIGATION
+## QUICK NAVIGATION
 
 | Document | Purpose |
 |----------|---------|
@@ -21,7 +21,7 @@ This is a **4-member team project** that implements a real-world fraud detection
 
 ---
 
-## 👥 TEAM ROLES
+##  TEAM ROLES
 
 | # | Role | Deliverable |
 |---|------|-------------|
@@ -32,7 +32,7 @@ This is a **4-member team project** that implements a real-world fraud detection
 
 ---
 
-## 🚀 QUICK START
+## QUICK START
 
 ```bash
 # Get Flink (Member 1)
@@ -52,7 +52,7 @@ kill -9 $(jps | grep TaskManager | head -1 | awk '{print $1}')
 
 ---
 
-## 🎬 THREE MANDATORY DEMONSTRATIONS
+## THREE MANDATORY DEMONSTRATIONS
 
 1. **Parallel Processing** → 4 subtasks in Web UI 
 2. **Checkpointing** → Checkpoint directory growth every 10s
@@ -60,7 +60,7 @@ kill -9 $(jps | grep TaskManager | head -1 | awk '{print $1}')
 
 ---
 
-## 📚 DETAILED DOCUMENTATION
+## DETAILED DOCUMENTATION
 
 **→ Start Here:** [TEAM_COORDINATION.md](TEAM_COORDINATION.md) - Complete 4-member plan  
 **→ Then Use:** [SETUP_GUIDE.md](SETUP_GUIDE.md) - Step-by-step setup  
