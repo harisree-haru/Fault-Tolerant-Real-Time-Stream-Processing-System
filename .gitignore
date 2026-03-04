@@ -1,0 +1,20 @@
+# Maven
+apache-maven-*/
+maven/
+maven.zip
+.m2/
+target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.class
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.jar
+!target/fraud-detection.jar
