@@ -49,6 +49,8 @@ start-jobmanager.bat
 start_docker_cluster.py
 submit_job.py
 licenses/
+LICENSE
+NOTICE
 
 # IDE
 .idea/
