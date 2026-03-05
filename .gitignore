@@ -5,6 +5,34 @@ maven.zip
 .m2/
 target/
 
+# Flink Distribution (Downloaded, not source)
+flink-1.17.1/
+flink/
+lib/
+opt/
+bin/config.sh
+bin/find-flink-home.sh
+bin/flink
+bin/flink-console.sh
+bin/flink-daemon.sh
+bin/historyserver.sh
+bin/jobmanager.sh
+bin/kubernetes-*.sh
+bin/pyflink-shell.sh
+bin/sql-client.sh
+bin/sql-gateway.sh
+bin/standalone-job.sh
+bin/start-cluster.sh
+bin/start-zookeeper-*.sh
+bin/stop-cluster.sh
+bin/stop-zookeeper-*.sh
+bin/taskmanager.sh
+bin/yarn-session.sh
+bin/zookeeper.sh
+conf/
+plugins/
+examples/
+
 # IDE
 .idea/
 .vscode/
@@ -16,5 +44,19 @@ target/
 Thumbs.db
 
 # Build artifacts
+*.class
 *.jar
 !target/fraud-detection.jar
+*.zip
+
+# Runtime
+logs/
+log4j*.log
+*.log
+checkpoint/
+savepoints/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
