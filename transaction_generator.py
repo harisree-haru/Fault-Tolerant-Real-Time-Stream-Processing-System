@@ -40,18 +40,25 @@ class TransactionGenerator:
         # Payment methods
         self.payment_methods = ['CREDIT_CARD', 'DEBIT_CARD', 'PAYPAL', 'BANK_TRANSFER']
         
-    def connect(self):
-        """Connect to Flink socket source"""
+    def start_server(self):
+        """Start a socket server that listens for Flink connections"""
         try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((self.host, self.port))
-            print(f"✅ Connected to {self.host}:{self.port}")
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.server.bind((self.host, self.port))
+            self.server.listen(1)
+            print(f"🔌 Transaction server listening on {self.host}:{self.port}")
+            print(f"   Waiting for Flink to connect...")
+            
+            # Accept incoming connection from Flink
+            self.sock, addr = self.server.accept()
+            print(f"✅ Flink connected from {addr}")
             return True
         except Exception as e:
-            print(f"❌ Failed to connect to {self.host}:{self.port}")
+            print(f"❌ Failed to start server on {self.host}:{self.port}")
             print(f"   Error: {e}")
-            print(f"\n   Make sure Flink socket source is listening on {self.host}:{self.port}")
-            print(f"   You can start it with: nc -l {self.port}")
+            print(f"\n   Make sure the Fraud Detection Pipeline is NOT running on port {self.port}")
+            print(f"   Or the port may already be in use by another process")
             return False
     
     def generate_transaction(self, txn_id):
@@ -99,11 +106,11 @@ class TransactionGenerator:
     
     def run(self):
         """Main loop: generate and send transactions"""
-        if not self.connect():
+        if not self.start_server():
             return
         
         print(f"\n📊 Generating {self.transactions} transactions (delay: {self.delay}s between each)")
-        print(f"💾 Sending to socket: {self.host}:{self.port}")
+        print(f"📤 Sending through socket: {self.host}:{self.port}")
         print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         
         try:
@@ -131,6 +138,7 @@ class TransactionGenerator:
             print(f"\n❌ Error during generation: {e}")
         finally:
             self.sock.close()
+            self.server.close()
             print("Socket connection closed")
 
 def main():
