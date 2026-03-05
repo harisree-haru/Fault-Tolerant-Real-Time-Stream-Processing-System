@@ -33,6 +33,23 @@ conf/
 plugins/
 examples/
 
+# Demo and Helper Files (not part of core implementation)
+DEMO_READY.md
+FINAL_SETUP_GUIDE.md
+QUICK_START.txt
+README.txt
+README_DEMO.txt
+RUN_DEMO.md
+START.bat
+docker-compose.yml
+launch_flink_cluster.py
+run-local-simple.bat
+start-flink-cluster.sh
+start-jobmanager.bat
+start_docker_cluster.py
+submit_job.py
+licenses/
+
 # IDE
 .idea/
 .vscode/
@@ -55,8 +72,4 @@ log4j*.log
 *.log
 checkpoint/
 savepoints/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
+log/
