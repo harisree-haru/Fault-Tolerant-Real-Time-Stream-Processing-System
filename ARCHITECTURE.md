@@ -8,7 +8,7 @@ The Fraud Detection System demonstrates a fault-tolerant, distributed stream pro
 ## 1. HIGH-LEVEL ARCHITECTURE
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
+┌─────────────────────────────────────────────────────────────────┐ 
 │                    FLINK LOCAL CLUSTER (Distributed)            │
 │                                                                   │
 │  ┌──────────────────────────────────────────────────────────┐   │
@@ -398,7 +398,222 @@ NORMAL OPERATION RESUMED:
 
 ---
 
-## 8. PERFORMANCE CHARACTERISTICS
+## 8. MULTI-SYSTEM DEPLOYMENT (4-System Production Setup)
+
+### Architecture Overview
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                      4-SYSTEM DISTRIBUTED DEPLOYMENT                  │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                        │
+│  SYSTEM 1                SYSTEM 2               SYSTEM 3    SYSTEM 4  │
+│  (Producer)              (JobManager)           (TM1)      (TM2)      │
+│  ┌─────────────┐         ┌──────────────┐     ┌────────┐ ┌────────┐  │
+│  │  TX Gen     │─────────│  JobManager  │────→│ TaskMgr│ │TaskMgr │  │
+│  │  Port:9999  │         │  Port:6123   │     │Slot 1-4│ │Slot 5-8│  │
+│  │  (Socket    │         │  Web UI:8081 │     │Window  │ │Alerts  │  │
+│  │   Server)   │         │              │     │Aggreg. │ │Output  │  │
+│  └─────────────┘         └──────────────┘     └────────┘ └────────┘  │
+│                                  │                │          │         │
+│                                  └────────────────┼──────────┘         │
+│                                                   │                     │
+│                              CHECKPOINT STORAGE   │                     │
+│                              (Network Share)      │                     │
+│                              // \\server\share   │                     │
+│                                   ↑              │                     │
+│                                   └──────────────┘                     │
+│                              Barrier Flow via Akka                      │
+│                              Every 10 Seconds                           │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### System Configuration
+
+| Component | System | Role | Requirements |
+|-----------|--------|------|--------------|
+| **Transaction Generator** | System 1 | Data Source | Python 3.8+, Network Access |
+| **JobManager (Master)** | System 2 | Coordination & Orchestration | JDK-17, 2+ CPU, 4GB RAM |
+| **TaskManager 1** | System 3 | Worker (Slots 1-4) | JDK-17, 2+ CPU, 4GB RAM |
+| **TaskManager 2** | System 4 | Worker (Slots 5-8) | JDK-17, 2+ CPU, 4GB RAM |
+
+### Network Configuration
+
+| Communication | Port | Protocol | Direction |
+|---------------|------|----------|-----------|
+| Transactions | 9999 | TCP/Socket | System 1 → System 2 |
+| JobManager RPC | 6123 | Akka (RPC) | System 2 ↔ System 3,4 |
+| REST API | 8081 | HTTP | System 2 ← (Monitoring) |
+| Checkpoint Barrier | Variable | Akka | System 2 → System 3,4 |
+
+### Setup Instructions
+
+#### **Phase 1: System 1 (Transaction Generator)**
+```bash
+# On System 1 machine
+git clone https://github.com/harisree-haru/Fault-Tolerant-Real-Time-Stream-Processing-System.git
+cd Fault-Tolerant-Real-Time-Stream-Processing-System
+python transaction_generator.py --host 0.0.0.0 --port 9999 --delay 0.5 --count 10000
+```
+**Output**: Listening on 0.0.0.0:9999 (accepts connections from remote systems)
+
+#### **Phase 2: System 2 (JobManager)**
+```bash
+# On System 2 machine (must be Java 17 + Flink 1.17.1)
+export FLINK_HOME=/path/to/flink-1.17.1
+export JAVA_HOME=/path/to/jdk-17
+
+# Configure flink-conf.yaml for distributed mode
+# Update: conf/flink-conf.yaml
+#   jobmanager.rpc.address: <SYSTEM2_IP>
+#   jobmanager.rpc.port: 6123
+#   taskmanager.memory.process.size: 1600m
+#   taskmanager.numberOfTaskSlots: 4
+
+# Start JobManager
+$FLINK_HOME/bin/jobmanager.sh start
+```
+**Verify**: Access Web UI at http://<SYSTEM2_IP>:8081
+
+#### **Phase 3: System 3 & 4 (TaskManagers)**
+```bash
+# On System 3 and System 4 (same setup on both)
+export FLINK_HOME=/path/to/flink-1.17.1
+export JAVA_HOME=/path/to/jdk-17
+
+# Update: conf/flink-conf.yaml
+#   jobmanager.rpc.address: <SYSTEM2_IP>
+#   jobmanager.rpc.port: 6123
+#   taskmanager.memory.process.size: 1600m
+#   taskmanager.numberOfTaskSlots: 4
+
+# Start TaskManager
+$FLINK_HOME/bin/taskmanager.sh start
+```
+**Verify**: Navigate to JobManager Web UI → Taskmanagers tab (should show 2 active)
+
+#### **Phase 4: Submit Job**
+```bash
+# From any system with Flink CLI
+$FLINK_HOME/bin/flink run \
+  --jobmanager <SYSTEM2_IP>:6123 \
+  --parallelism 8 \
+  fraud-detection.jar \
+  --host <SYSTEM1_IP> \
+  --port 9999
+```
+
+### Data Distribution Across Systems
+
+```
+Transaction from System 1 arrives at System 2 (JobManager)
+                          │
+                          ▼
+                [Deserialize JSON → Transaction POJO]
+                          │
+                          ▼
+            [keyBy(userId) - Hash Partition Assignment]
+                    │          │
+                    ▼          ▼
+        ┌─────────────────────────────┐
+        │ Hash(userId) % parallelism  │
+        │ (8 total partitions)        │
+        └─────────────────────────────┘
+                    │          │
+        ┌───────────┼──────────┴──────────┐
+        │           │                     │
+        ▼           ▼                     ▼
+    System 3    System 3                System 4
+    Slot 1      Slot 2-4  [shuffled]    Slot 5-8
+    (userId     (userId                 (userId
+    0,8)        1,2,3,4,5,6,7)          remainder)
+```
+
+**Key Point**: Transactions for the same user (keyBy userId) always go to the same TaskManager slot → preserves state locality
+
+### Checkpoint & State Management
+
+All systems write to a **shared checkpoint backend**:
+
+```
+System 2 (JobManager)           System 3 (TaskManager 1)    System 4 (TaskManager 2)
+┌──────────────────┐            ┌──────────────────┐        ┌──────────────────┐
+│ Triggers barrier │            │ Emits barrier    │        │ Emits barrier    │
+│ every 10 seconds │────────────→│ to Task Manager  │───────→│ to Task Manager  │
+│                  │            │                  │        │                  │
+│ Coordinates      │            │ Serializes state │        │ Serializes state │
+│ completion       │            │                  │        │                  │
+│                  │            │ Sends to shared  │        │ Sends to shared  │
+│                  │◄───────────│ checkpoint dir   │◄───────│ checkpoint dir   │
+└──────────────────┘            └──────────────────┘        └──────────────────┘
+         │
+         └─→ Write to NFS: \\server\flink-checkpoints\chk-NNN\
+             Structure: {taskid}/operator_0/state
+```
+
+**Exactly-Once Guarantee**: All 3 systems complete barrier → state committed
+
+### Failure Scenarios
+
+#### Scenario 1: TaskManager 2 (System 4) Fails
+```
+1. Without heartbeat for 10 seconds
+2. JobManager declares failure
+3. All tasks restart from last checkpoint
+4. System 3 continues, System 4 reverts to checkpoint state
+5. Processing resumes without data loss or duplication
+6. New TaskManager can rejoin anytime
+```
+
+#### Scenario 2: JobManager (System 2) Fails
+```
+1. Manual intervention required (HA mode needs additional setup)
+2. Start new JobManager pointing to previous checkpoint
+3. TaskManagers reconnect
+4. Resume from last consistent checkpoint
+```
+
+#### Scenario 3: Network Partition (System 1 ↔ System 2)
+```
+1. Transaction source stops sending
+2. Pipeline buffers drain
+3. No new checkpoints triggered
+4. Upon reconnection, resume from last checkpoint
+```
+
+### Monitoring & Debugging
+
+**JobManager Web UI** (http://System2_IP:8081):
+- Active Tasks: Shows 8 parallel subtasks
+- Checkpoint History: Each 10-second barrier
+- Parallelism: 8 (4 from System 3, 4 from System 4)
+- Fail Rate: 0 (if system is stable)
+
+**Logs**:
+- System 2: `$FLINK_HOME/log/flink-*-jobmanager-*.log`
+- System 3: `$FLINK_HOME/log/flink-*-taskmanager-*.log`
+- System 4: `$FLINK_HOME/log/flink-*-taskmanager-*.log`
+
+**Testing**:
+```bash
+# Terminal 1: Start transaction generator on System 1
+python transaction_generator.py --count 500
+
+# Terminal 2: Monitor Web UI (System 2)
+# Watch: Tasks processed count increases every 5 minutes
+
+# Terminal 3: Check checkpoint directory
+ls -lh \\server\flink-checkpoints\
+# Should see chk-0001/, chk-0002/, etc. created every 10s
+
+# Terminal 4: Kill one TaskManager and verify recovery
+kill <taskmanager_pid>
+# Wait 15 seconds, should see recovery in Web UI
+```
+
+---
+
+## 9. PERFORMANCE CHARACTERISTICS
 
 | Metric | Expected Value | Significance |
 |--------|-----------------|--------------|
@@ -408,27 +623,47 @@ NORMAL OPERATION RESUMED:
 | Throughput | 100-500 txn/sec | Depends on parallelism (4 workers = 4x speedup) |
 | Latency (end-to-end) | 5-10 seconds | Window aggregation + processing delay |
 | State Size | ~1-10 MB | Depends on unique users and window size |
+| Multi-System Scalability | Linear (8 slots) | 2 TaskManagers × 4 slots = 8x more parallelism |
 
 ---
 
-## 9. DEMONSTRATION EVIDENCE
+## 10. DEMONSTRATION EVIDENCE
 
-### Use Case 1: Normal Distributed Stream Processing
-- Show: 4 parallel subtasks in Web UI
-- Show: Transactions from different users flowing through different partitions
-- Prove: Distributed execution across TaskManagers
+### Single-System Testing (Embedded Mode)
+- Show: Transaction generator connects to localhost:9999
+- Show: LocalStreamFraudDetectorJob processes 100+ txn in console
+- Prove: Event-time windowing (5-minute windows)
+- Verify: Fraud alerts with risk scores appear correctly
 
-### Use Case 2: Checkpoint Creation
-- Show: Checkpoint directory growing with chk-001, chk-002, etc.
-- Show: Web UI checkpoint timeline (every 10 seconds)
-- Prove: Chandy-Lamport algorithm running
+### Use Case 1: Normal Distributed Stream Processing (4 Systems)
+- **Setup**: JobManager on System 2, TaskManagers on System 3 & 4, TxGen on System 1
+- **Evidence**:
+  - Web UI shows 8 active parallel subtasks
+  - Transactions from different users flow to different TaskManager slots
+  - Checkpoint directory grows (chk-0001/, chk-0002/, etc. every 10s)
+  - Fraud alerts appear every 5 minutes with proper formatting
+- **Prove**: Distributed execution across multiple physical machines
+
+### Use Case 2: Checkpoint Creation (Chandy-Lamport)
+- Show: Checkpoint directory on NFS with increasing chk-XXX directories
+- Show: Web UI Timeline tab shows checkpoint barrier flow
+- Show: Latency between barrier injection and completion (<5 seconds for 8 slots)
+- Prove: Chandy-Lamport algorithm coordinating snapshots across 3 systems
 
 ### Use Case 3: Failure & Automatic Recovery
-- Show: Kill TaskManager process
-- Show: JobManager detects failure
-- Show: Job restarts from latest checkpoint
-- Prove: No data loss, no duplicates
-- Verify: Same user states restored correctly
+- Show: 2 TaskManagers in Web UI ("Active Taskmanagers: 2")
+- Show: Kill one TaskManager process (`kill <pid>`)
+- Show: JobManager detects failure within 15 seconds
+- Show: Tasks reschedule on remaining TaskManager
+- Show: Job continues from last checkpoint without data loss
+- Verify: Same user states restored, no duplicate fraud alerts
+- Prove: Exactly-once semantics maintained across failure
+
+### Use Case 4: Network Resilience
+- Setup: Test with network latency between systems
+- Show: System handles out-of-order transactions (5-second grace period)
+- Show: Watermarks propagate correctly despite delays
+- Prove: Event-time processing is network-latency-tolerant
 
 ---
 
@@ -438,7 +673,9 @@ NORMAL OPERATION RESUMED:
 - **Master-Worker Pattern:** Coordinated distributed computing
 - **Exactly-Once Semantics:** Guarantees in stream processing
 - **Flink Checkpointing:** Implementation of distributed snapshots
+- **Apache Flink Distributed Architecture:** JobManager-TaskManager topology
 
 ---
 
-*Last Updated: March 4, 2026*
+*Last Updated: March 5, 2026*
+*Multi-System Deployment: Ready for Production Testing*
