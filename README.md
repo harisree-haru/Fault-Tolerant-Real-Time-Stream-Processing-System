@@ -5,7 +5,7 @@
 
 ---
 
-## 📋 QUICK SUMMARY
+##  QUICK SUMMARY
 
 This is a **4-member team project** that implements a real-world fraud detection system using Apache Flink. The system processes thousands of e-commerce transactions in real-time, detects fraudulent patterns, and recovers automatically from worker failures without losing any data.
 
