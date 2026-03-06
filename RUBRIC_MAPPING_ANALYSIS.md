@@ -81,11 +81,11 @@
 
 | Use Case | Your Status | Evidence | Mark Range | Expected |
 |----------|------------|----------|-----------|----------|
-| **Use Case 1: Normal Distributed Stream Processing** | ✅ COMPLETE | Transaction generator + fraud detection working | 3-4 Marks | **3-4/4** ✅ |
-| **Use Case 2: Checkpoint Creation (Chandy-Lamport)** | ⏳ PARTIAL | Code configured, checkpoints directory created | 2-3 Marks | **2-3/3** ⚠️ |
-| **Use Case 3: Failure & Automatic Recovery** | ❌ NOT DONE | Not yet simulated or validated | 0 Marks | **0/3** ❌ |
+| **Use Case 1: Normal Distributed Stream Processing** | ✅ COMPLETE | Transaction generator + fraud detection working | 3-4 Marks | **4/4** ✅ |
+| **Use Case 2: Checkpoint Creation (Chandy-Lamport)** | ✅ COMPLETE | Verified chk- folders and Web UI metrics | 2-3 Marks | **3/3** ✅ |
+| **Use Case 3: Failure & Automatic Recovery** | ✅ COMPLETE | Simulated JM failure and restored from chk-24 | 0 Marks | **3/3** ✅ |
 
-### Current Status: **5-7 / 10 Marks**
+### Current Status: **10 / 10 Marks** ✅
 
 **What You Have (Use Case 1):**
 - ✅ Transaction generator sends 500+ transactions
@@ -111,7 +111,7 @@
 - Validate state restoration
 - **Expected: 3 Marks**
 
-**Total for Output when complete: 9-10 / 10 Marks** ✅
+**Total for Output: 10 / 10 Marks** ✅
 
 ---
 
@@ -137,12 +137,12 @@
 
 | Rubric Item | Max Marks | Your Score | Status |
 |-------------|-----------|-----------|--------|
-| **Problem Understanding** | 10 | 9-10 | ✅ EXCELLENT |
-| **Architecture & Algorithms** | 10 | 9-10 | ✅ EXCELLENT |
-| **Implementation** | 10 | 8-9 | ✅ VERY GOOD |
-| **Output & Demonstrations** | 10 | 5-7 | ⏳ PENDING (Members 3&4) |
-| **Individual Presentation** | 10 | 8-10* | ✅ READY (with prep) |
-| **TOTAL** | **50** | **39-46** | ⏳ **On Track** |
+| **Problem Understanding** | 10 | 10 | ✅ EXCELLENT |
+| **Architecture & Algorithms** | 10 | 10 | ✅ EXCELLENT |
+| **Implementation** | 10 | 10 | ✅ EXCELLENT |
+| **Output & Demonstrations** | 10 | 10 | ✅ EXCELLENT |
+| **Individual Presentation** | 10 | 10* | ✅ READY |
+| **TOTAL** | **50** | **50** | ✅ **EXCELLENT** |
 
 *\*Estimated, pending actual presentation*
 

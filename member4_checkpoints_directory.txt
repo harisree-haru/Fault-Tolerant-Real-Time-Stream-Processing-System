@@ -1,0 +1,50 @@
+total 0
+drwxr-xr-x@ 9 nanducc  wheel  288 Mar  6 22:52 .
+drwxrwxrwx@ 3 nanducc  wheel   96 Mar  6 22:51 ..
+drwxr-xr-x@ 3 nanducc  wheel   96 Mar  6 22:51 chk-5
+drwxr-xr-x@ 3 nanducc  wheel   96 Mar  6 22:52 chk-6
+drwxr-xr-x@ 3 nanducc  wheel   96 Mar  6 22:52 chk-7
+drwxr-xr-x@ 3 nanducc  wheel   96 Mar  6 22:52 chk-8
+drwxr-xr-x@ 3 nanducc  wheel   96 Mar  6 22:52 chk-9
+drwxr-xr-x@ 2 nanducc  wheel   64 Mar  6 22:51 shared
+drwxr-xr-x@ 2 nanducc  wheel   64 Mar  6 22:51 taskowned
+
+/tmp/flink-checkpoints/ea128c0509ae80729e8590f81c3b7f59/chk-5:
+total 32
+drwxr-xr-x@ 3 nanducc  wheel     96 Mar  6 22:51 .
+drwxr-xr-x@ 9 nanducc  wheel    288 Mar  6 22:52 ..
+-rw-r--r--@ 1 nanducc  wheel  12653 Mar  6 22:51 _metadata
+
+/tmp/flink-checkpoints/ea128c0509ae80729e8590f81c3b7f59/chk-6:
+total 32
+drwxr-xr-x@ 3 nanducc  wheel     96 Mar  6 22:52 .
+drwxr-xr-x@ 9 nanducc  wheel    288 Mar  6 22:52 ..
+-rw-r--r--@ 1 nanducc  wheel  12645 Mar  6 22:52 _metadata
+
+/tmp/flink-checkpoints/ea128c0509ae80729e8590f81c3b7f59/chk-7:
+total 32
+drwxr-xr-x@ 3 nanducc  wheel     96 Mar  6 22:52 .
+drwxr-xr-x@ 9 nanducc  wheel    288 Mar  6 22:52 ..
+-rw-r--r--@ 1 nanducc  wheel  12652 Mar  6 22:52 _metadata
+
+/tmp/flink-checkpoints/ea128c0509ae80729e8590f81c3b7f59/chk-8:
+total 32
+drwxr-xr-x@ 3 nanducc  wheel     96 Mar  6 22:52 .
+drwxr-xr-x@ 9 nanducc  wheel    288 Mar  6 22:52 ..
+-rw-r--r--@ 1 nanducc  wheel  12655 Mar  6 22:52 _metadata
+
+/tmp/flink-checkpoints/ea128c0509ae80729e8590f81c3b7f59/chk-9:
+total 32
+drwxr-xr-x@ 3 nanducc  wheel     96 Mar  6 22:52 .
+drwxr-xr-x@ 9 nanducc  wheel    288 Mar  6 22:52 ..
+-rw-r--r--@ 1 nanducc  wheel  12652 Mar  6 22:52 _metadata
+
+/tmp/flink-checkpoints/ea128c0509ae80729e8590f81c3b7f59/shared:
+total 0
+drwxr-xr-x@ 2 nanducc  wheel   64 Mar  6 22:51 .
+drwxr-xr-x@ 9 nanducc  wheel  288 Mar  6 22:52 ..
+
+/tmp/flink-checkpoints/ea128c0509ae80729e8590f81c3b7f59/taskowned:
+total 0
+drwxr-xr-x@ 2 nanducc  wheel   64 Mar  6 22:51 .
+drwxr-xr-x@ 9 nanducc  wheel  288 Mar  6 22:52 ..
