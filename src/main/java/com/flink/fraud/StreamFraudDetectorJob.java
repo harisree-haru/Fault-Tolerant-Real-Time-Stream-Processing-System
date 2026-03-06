@@ -50,8 +50,7 @@ public class StreamFraudDetectorJob {
         // 2. DEFINE DATA SOURCE
         // Listen on localhost:9999 for incoming transaction JSON
         // Format: {"transactionId":"txn_1","userId":"user_001",...}
-        var transactionStream = env.socketTextStream("localhost", 9999)
-                .setParallelism(4);  // Distribute across 4 parallel subtasks
+        var transactionStream = env.socketTextStream("localhost", 9999);
 
         logger.info("Transaction source configured - listening on localhost:9999");
 
@@ -59,6 +58,10 @@ public class StreamFraudDetectorJob {
         // MapFunction: String JSON → Transaction POJO
         var parsedTransactions = transactionStream
                 .map(new TransactionParser())
+                .assignTimestampsAndWatermarks(
+                        WatermarkStrategy.<Transaction>forMonotonousTimestamps()
+                                .withTimestampAssigner((txn, timestamp) -> txn.timestamp)
+                )
                 .setParallelism(4)
                 .name("Parse Transactions");
 
