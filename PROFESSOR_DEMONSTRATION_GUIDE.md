@@ -23,9 +23,13 @@ We use the **Chandy-Lamport algorithm** to create "snapshots" of the entire syst
 - **Checkpointing:** Every 10 seconds, Flink saves the current "cursor" of the stream and the state of fraud detectors (e.g., aggregation counts) to persistent storage.
 - **Exactly-Once Semantics:** By storing the exact stream offset and operator state together, we ensure that during recovery, no transaction is processed twice or missed.
 
-### Visual Proof: Checkpoint History
-![Checkpoint Metrics](/Users/nanducc/Desktop/ds_apacheFlink/Fault-Tolerant-Real-Time-Stream-Processing-System/final_ss/checkpoint_metrics.png)
-*Observation: Regular 10-second intervals and consistent state sizes prove reliable checkpointing.*
+### Visual Proof: Checkpoint Configuration
+![Checkpoint Configuration](/Users/nanducc/Desktop/ds_apacheFlink/Fault-Tolerant-Real-Time-Stream-Processing-System/final_ss/member4_checkpoint_config.png)
+*Observation: This shows the "Exactly Once" mode and 10s interval configured for our specific job.*
+
+### Visual Proof: Checkpoint Metrics
+![Checkpoint Summary](/Users/nanducc/Desktop/ds_apacheFlink/Fault-Tolerant-Real-Time-Stream-Processing-System/final_ss/member4_checkpoint_summary.png)
+*Observation: Regular intervals and consistent state sizes prove reliable checkpointing.*
 
 ---
 

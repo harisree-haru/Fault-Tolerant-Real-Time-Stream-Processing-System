@@ -29,7 +29,7 @@ _metadata (within each chk- folder)
 ## 3. Web UI Metrics Screenshot
 The Flink Web UI confirms that checkpoints are being triggered every 10 seconds and completing with ~10 KB of state size.
 
-![Flink Checkpoints History](/Users/nanducc/Desktop/ds_apacheFlink/Fault-Tolerant-Real-Time-Stream-Processing-System/final_ss/checkpoint_metrics.png)
+![Flink Checkpoint Summary](/Users/nanducc/Desktop/ds_apacheFlink/Fault-Tolerant-Real-Time-Stream-Processing-System/final_ss/member4_checkpoint_summary.png)
 
 ## 4. Failure & Recovery Validation
 ### Failure Simulation
