@@ -9,8 +9,8 @@
 # JobManager Configuration
 # ============================
 
-# JobManager runs on localhost by default
-jobmanager.rpc.address: localhost
+# DISTRIBUTED SETUP: Point to Laptop 1 (Master)
+jobmanager.rpc.address: 10.12.70.214
 jobmanager.rpc.port: 6123
 
 # JobManager memory
@@ -32,6 +32,7 @@ taskmanager.numberOfTaskSlots: 4
 taskmanager.memory.process.size: 1728m
 
 # Network buffers
+taskmanager.network.memory.fraction: 0.1
 taskmanager.network.memory.fraction: 0.1
 
 # ============================

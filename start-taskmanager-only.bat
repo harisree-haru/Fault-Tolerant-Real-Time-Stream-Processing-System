@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-set "FLINK_HOME=%~dp0flink-1.17.1"
+set "FLINK_HOME=%CD%"
 set "FLINK_CONF=%FLINK_HOME%\conf"
 
 set "CLASSPATH=%FLINK_CONF%"

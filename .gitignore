@@ -75,3 +75,18 @@ log4j*.log
 checkpoint/
 savepoints/
 log/
+
+# Generated Output Files
+*.out
+generator_recovery.out
+member4_checkpoints_directory.txt
+
+# Screenshots and Demo Files
+screenshots/
+final_ss/
+check_status.py
+fraud_alert_simulator.py
+start-cluster.bat
+start-jobmanager-clean.ps1
+start-taskmanager-clean.ps1
+DEMO_SCRIPT.md
