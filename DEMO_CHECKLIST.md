@@ -1,12 +1,12 @@
-# Demo Checklist: Fault-Tolerant Real-Time Stream Processing System
+# DEMO CHECKLIST — 10 Minute Quick Setup
 
-**Presenter:** Member 2 (Core Streaming Developer)  
-**Date:** March 4, 2026  
-**Systems to Demo:** 3 different machines  
+**For:** 4-Laptop Distributed System Demo  
+**Timeline:** 3-4 minutes live, 1 minute setup per laptop  
+**Key Insight:** Show architecture + code quality, not just working cluster
 
 ---
 
-## PRE-DEMO TESTING (Current System)
+## PRE-DEMO PREP (Do These Now)
 
 ### ✓ System Requirements Check
 - [ ] Java 11+ installed: `java -version`

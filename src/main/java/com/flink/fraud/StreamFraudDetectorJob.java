@@ -153,8 +153,8 @@ public class StreamFraudDetectorJob {
         // On failure: Restart job from latest checkpoint
         // This is Master-Worker architecture: JobManager detects failure via heartbeats,
         // then auto-restarts TaskManagers with saved state
-        env.getCheckpointConfig().setFailOnCheckpointingErrors(false);
-        logger.info("Failure handling: Auto-restart with latest checkpoint");
+        env.getCheckpointConfig().setTolerableCheckpointFailureNumber(3);
+        logger.info("Failure handling: Auto-restart with latest checkpoint (max 3 failure tolerations)");
 
         // STATE BACKEND: HashMapStateBackend
         // Stores state in memory with asynchronous snapshots
